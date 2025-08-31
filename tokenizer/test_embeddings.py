@@ -25,9 +25,9 @@ output_dim = 256
 token_embedding_layer = torch.nn.Embedding(vocab_size, output_dim)
 
 """
-Let's now try to also include positional information in the token embeddings
+if we sample data from the data loader,
+we embed each token in each batch into a 256-dimensional vector.
 """
-
 max_len = 4
 data_loader = create_dataloader_v1(
     raw_text, batch_size=8, max_length=max_len, stride=max_len, shuffle=False
@@ -36,3 +36,28 @@ data_iter = iter(data_loader)
 inputs, targets = next(data_iter)
 print("Token IDs:\n", inputs)
 print("Inputs shape:", inputs.shape)
+
+"""
+Let's now embed the token IDs into a 256-dimensional vector
+"""
+
+token_embeddings = token_embedding_layer(inputs)
+print(token_embeddings.shape)
+
+"""
+For a GPT model’s absolute embedding approach, we just need to create another
+embedding layer that has the same embedding dimension as the token_embedding_
+layer
+"""
+context_length = max_len
+pos_embedding_layer = torch.nn.Embedding(context_length, output_dim)
+pos_embeddings = pos_embedding_layer(torch.arange(context_length))
+print(pos_embeddings.shape)
+
+"""
+We can now add these directly to the token embeddings, where PyTorch will add
+the 4 × 256–dimensional pos_embeddings tensor to each 4 × 256–dimensional token
+embedding tensor in each of the eight batches
+"""
+input_embeddings = token_embeddings + pos_embeddings
+print(input_embeddings.shape)
