@@ -1,7 +1,6 @@
 import sys
 import os
 
-import torch
 from attention.multi_head_attention import MultiHeadAttention
 from torch import nn
 

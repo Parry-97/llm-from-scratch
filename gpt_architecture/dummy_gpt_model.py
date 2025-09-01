@@ -1,4 +1,6 @@
 from torch import nn
+from gpt_architecture.transformer import TransformerBlock
+from gpt_architecture.layer_normalization import LayerNorm
 import torch
 
 
@@ -21,10 +23,12 @@ class DummyGPTModel(nn.Module):
         self.drop_emb = nn.Dropout(cfg["drop_rate"])
 
         self.trf_blocks = nn.Sequential(
-            *[DummyTransformerBlock(cfg) for _ in range(cfg["n_layers"])]
+            *[TransformerBlock(cfg) for _ in range(cfg["n_layers"])]
         )
 
-        self.final_norm = DummyLayerNorm(cfg["emb_dim"])
+        self.final_norm = LayerNorm(cfg["emb_dim"])
+
+        # NOTE: The final layer gets emb_dim features and outputs vocab_size outputs
         self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
 
     def forward(self, in_idx):
