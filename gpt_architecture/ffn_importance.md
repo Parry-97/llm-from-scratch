@@ -131,4 +131,3 @@ Studies have shown that specific neurons in FFNs activate for concepts like:
 - "Mathematical operations"
 
 This is why FFNs are essential - they're not just "extra layers" but fundamental to how Transformers process and understand information!
-MarkAsCompleted: 1 items
