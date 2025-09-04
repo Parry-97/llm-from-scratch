@@ -16,13 +16,15 @@ This repository documents my journey through **"Build a Large Language Model (Fr
 
 Currently implementing: **"Pretraining on unlabeled data"**
 
-#### ✅ Completed Chapters:
+#### ✅ Completed Chapters
+
 - **Chapter 1**: Understanding large language models
 - **Chapter 2**: Working with text data
 - **Chapter 3**: Coding attention mechanisms
 - **Chapter 4**: Implementing a GPT model from scratch to generate text
 
-#### 🔜 Upcoming Chapters:
+#### 🔜 Upcoming Chapters
+
 - **Chapter 6**: Fine-tuning for classification
 - **Chapter 7**: Fine-tuning to follow instructions
 
@@ -42,31 +44,41 @@ By following along with the book and this implementation, I'm learning:
 ### ✨ Implemented Components
 
 #### 📝 **Text Data Processing (Chapter 2)**
-- **SimpleTokenizerV1** ([tokenizer/simple_tokenizer.py](tokenizer/simple_tokenizer.py)): Custom regex-based tokenizer
+
+- **SimpleTokenizerV1** ([src/llm_from_scratch/tokenizer/simple_tokenizer.py](src/llm_from_scratch/tokenizer/simple_tokenizer.py)): Custom regex-based tokenizer
 - Text splitting and preprocessing utilities
 - Vocabulary management and encoding/decoding
 - Dataset preparation for training
+- Text download utilities for fetching training data
 
 #### 🎯 **Attention Mechanisms (Chapter 3)**
-- **Simple Attention**: Basic attention implementation for understanding
-- **Causal Attention**: Masked attention to prevent looking ahead
-- **Multi-Head Attention** ([attention/multi_head_attention.py](attention/multi_head_attention.py)): Parallel attention heads with projection
+
+- **Simple Attention** ([src/llm_from_scratch/attention/simple_attention.py](src/llm_from_scratch/attention/simple_attention.py)): Basic attention implementation for understanding
+- **Causal Attention** ([src/llm_from_scratch/attention/causal_attention.py](src/llm_from_scratch/attention/causal_attention.py)): Masked attention to prevent looking ahead
+- **Multi-Head Attention** ([src/llm_from_scratch/attention/multi_head_attention.py](src/llm_from_scratch/attention/multi_head_attention.py)): Parallel attention heads with projection
+- **Trainable Attention** ([src/llm_from_scratch/attention/trainable_attention.py](src/llm_from_scratch/attention/trainable_attention.py)): Attention with learnable parameters
+- **Batched Multiplication** utilities for efficient tensor operations
 - Scaled dot-product attention with proper normalization
 
 #### 🤖 **GPT Model Architecture (Chapter 4 - Completed)**
-- **DummyGPTModel** ([gpt_architecture/dummy_gpt_model.py](gpt_architecture/dummy_gpt_model.py)): Complete GPT model implementation
-- **TransformerBlock** ([gpt_architecture/transformer.py](gpt_architecture/transformer.py)): Core transformer building block
-- **FeedForward Networks**: Position-wise feed-forward with GELU activation
-- **Layer Normalization**: Custom implementation for training stability
+
+- **DummyGPTModel** ([src/llm_from_scratch/gpt_architecture/dummy_gpt_model.py](src/llm_from_scratch/gpt_architecture/dummy_gpt_model.py)): Complete GPT model implementation
+- **TransformerBlock** ([src/llm_from_scratch/gpt_architecture/transformer.py](src/llm_from_scratch/gpt_architecture/transformer.py)): Core transformer building block
+- **FeedForward Networks** ([src/llm_from_scratch/gpt_architecture/feed_forward.py](src/llm_from_scratch/gpt_architecture/feed_forward.py)): Position-wise feed-forward with GELU activation
+- **GELU Activation** ([src/llm_from_scratch/gpt_architecture/gelu.py](src/llm_from_scratch/gpt_architecture/gelu.py)): Custom GELU implementation
+- **Layer Normalization** ([src/llm_from_scratch/gpt_architecture/layer_normalization.py](src/llm_from_scratch/gpt_architecture/layer_normalization.py)): Custom implementation for training stability
 - Positional embeddings (learned)
 - Residual connections and dropout
 
 #### 🔤 **Text Generation (Chapter 4 - Implemented)**
-- Greedy decoding with context window cropping (generate_text in gpt_architecture/text_generation.py)
+
+- Greedy decoding with context window cropping ([src/llm_from_scratch/gpt_architecture/text_generation.py](src/llm_from_scratch/gpt_architecture/text_generation.py))
 - Deterministic next-token selection via argmax over softmax logits
-- Example script: test_text_generation.py using tiktoken (cl100k_base)
+- Example script: [tests/test_text_generation.py](tests/test_text_generation.py) using tiktoken (cl100k_base)
 
 #### 📦 **Pretraining on Unlabeled Data (Chapter 5 - Current Focus)**
+
+- **Pretraining Utils** ([src/llm_from_scratch/pretraining/utils.py](src/llm_from_scratch/pretraining/utils.py)): Helper functions for training
 - Objective: next-token prediction on unlabeled corpora (language modeling)
 - Data pipeline: tokenize with tiktoken (cl100k_base), create sequences of length context_length with next-token targets
 - Batching: (batch_size, context_length) input IDs with shifted targets
@@ -78,34 +90,65 @@ By following along with the book and this implementation, I'm learning:
 
 ```
 llm-from-scratch/
-├── attention/                    # Chapter 3: Attention implementations
-│   ├── multi_head_attention.py  # Multi-head attention mechanism
-│   ├── self_attention.py        # Self-attention basics
-│   ├── causal_attention.py      # Masked attention for autoregression
-│   ├── simple_attention.py      # Simplified attention for learning
-│   └── *.md                     # Documentation and notes
-├── gpt_architecture/             # Chapter 4: GPT model components
-│   ├── dummy_gpt_model.py       # Main GPT model class
-│   ├── transformer.py           # Transformer block
-│   ├── feed_forward.py          # FFN layer
-│   ├── layer_normalization.py   # LayerNorm implementation
-│   ├── gelu.py                  # GELU activation
-│   └── text_generation.py       # Greedy decoding utilities
-├── tokenizer/                    # Chapter 2: Text processing
-│   ├── simple_tokenizer.py      # Tokenizer implementation
-│   ├── gpt_dataset.py          # Dataset utilities
-│   ├── sampling.py             # Generation sampling methods
-│   ├── text_splitting.py       # Text preprocessing
-│   └── the-verdict.txt         # Sample text data
-├── test_text_generation.py     # Example: run greedy text generation
-├── tests/                       # Unit tests
-├── pyproject.toml              # Project configuration
-└── README.md                   # This file
+├── src/
+│   └── llm_from_scratch/
+│       ├── __init__.py
+│       ├── attention/                    # Chapter 3: Attention implementations
+│       │   ├── __init__.py
+│       │   ├── simple_attention.py      # Simplified attention for learning
+│       │   ├── self_attention.py        # Self-attention basics
+│       │   ├── causal_attention.py      # Masked attention for autoregression
+│       │   ├── simple_causal_attention.py # Simple causal attention variant
+│       │   ├── trainable_attention.py   # Attention with learnable parameters
+│       │   ├── multi_head_attention.py  # Multi-head attention mechanism
+│       │   ├── multi_head_attention_wrapper.py # MHA wrapper utilities
+│       │   └── batched_multiplication.py # Batched tensor operations
+│       ├── gpt_architecture/             # Chapter 4: GPT model components
+│       │   ├── __init__.py
+│       │   ├── dummy_gpt_model.py       # Main GPT model class
+│       │   ├── transformer.py           # Transformer block
+│       │   ├── feed_forward.py          # FFN layer
+│       │   ├── layer_normalization.py   # LayerNorm implementation
+│       │   ├── gelu.py                  # GELU activation
+│       │   └── text_generation.py       # Greedy decoding utilities
+│       ├── tokenizer/                    # Chapter 2: Text processing
+│       │   ├── __init__.py
+│       │   ├── simple_tokenizer.py      # Tokenizer implementation
+│       │   ├── gpt_dataset.py          # Dataset utilities
+│       │   ├── sampling.py             # Generation sampling methods
+│       │   └── text_download.py        # Text data downloading
+│       └── pretraining/                  # Chapter 5: Pretraining components
+│           ├── __init__.py
+│           └── utils.py                 # Training utilities
+├── tests/                                # Test files and scripts
+│   ├── test_text_generation.py         # Text generation example
+│   ├── test_embeddings.py              # Embeddings testing
+│   ├── test_transformer_import.py      # Import verification
+│   ├── dummy_gpt_use.py                # GPT model usage example
+│   ├── loss_calculation.py             # Loss computation tests
+│   ├── text_splitting.py               # Text processing tests
+│   └── the-verdict.txt                 # Sample text data
+├── docs/                                 # Documentation and notes
+│   ├── ffn_importance.md
+│   ├── gpt_output.md
+│   ├── input_output_dimensions.md
+│   ├── llm-optimization-insights.md
+│   ├── positional_embedding.md
+│   ├── python_project_best_practices.md
+│   ├── pytorch_batched_matmul_guide.md
+│   ├── self_attention_explained.md
+│   ├── self_attention_weights.md
+│   └── trainable_weight_matrices.md
+├── main.py                              # Main entry point
+├── pyproject.toml                       # Project configuration
+├── uv.lock                              # Dependency lock file
+└── README.md                            # This file
 ```
 
 ## 🚀 Installation
 
 ### Prerequisites
+
 - Python 3.11+
 - Git
 - (Optional) CUDA-capable GPU for faster computation
@@ -115,23 +158,27 @@ llm-from-scratch/
 This project uses [uv](https://github.com/astral-sh/uv) for fast, reliable dependency management.
 
 1. **Clone the repository:**
+
 ```bash
 git clone <your-repo-url>
 cd llm-from-scratch
 ```
 
 2. **Install uv** (if not already installed):
+
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 3. **Create and activate virtual environment:**
+
 ```bash
 uv venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
 4. **Install dependencies:**
+
 ```bash
 uv sync
 ```
@@ -142,6 +189,7 @@ The project uses PyTorch 2.4.0 (CPU version by default). For GPU support:
 
 1. Visit [PyTorch Get Started](https://pytorch.org/get-started/locally/)
 2. Select your configuration and install:
+
 ```bash
 uv pip install torch --index-url https://download.pytorch.org/whl/cu121  # CUDA 12.1
 ```
@@ -151,7 +199,7 @@ uv pip install torch --index-url https://download.pytorch.org/whl/cu121  # CUDA 
 ### Basic Tokenization (Chapter 2)
 
 ```python
-from tokenizer.simple_tokenizer import SimpleTokenizerV1
+from llm_from_scratch.tokenizer.simple_tokenizer import SimpleTokenizerV1
 
 # Create tokenizer with vocabulary
 vocab = {
@@ -171,13 +219,13 @@ print(f"Decoded: {tokenizer.decode(token_ids)}")
 
 ```python
 import torch
-from attention.multi_head_attention import MultiHeadAttention
+from llm_from_scratch.attention.multi_head_attention import MultiHeadAttention
 
 # Setup multi-head attention
 batch_size, seq_len, d_model = 2, 10, 768
 mha = MultiHeadAttention(
     d_in=d_model,
-    d_out=d_model, 
+    d_out=d_model,
     context_length=seq_len,
     dropout=0.1,
     num_heads=12
@@ -193,7 +241,7 @@ print(f"Output shape: {output.shape}")  # [2, 10, 768]
 
 ```python
 import torch
-from gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
 
 # Model configuration
 config = {
@@ -223,8 +271,8 @@ Example using the greedy generation loop:
 ```python
 import torch
 from tiktoken import get_encoding
-from gpt_architecture.dummy_gpt_model import DummyGPTModel
-from gpt_architecture.text_generation import generate_text
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.text_generation import generate_text
 
 # Tokenizer and model configuration
 tokenizer = get_encoding("cl100k_base")
@@ -256,7 +304,7 @@ print(tokenizer.decode(out.squeeze(0).tolist()))
 Run the example script directly:
 
 ```bash
-uv run python test_text_generation.py
+uv run python tests/test_text_generation.py
 ```
 
 ## 🔬 Technical Implementation Details
@@ -301,6 +349,7 @@ Token IDs → Token Embeddings + Positional Embeddings
 - **[uv](https://github.com/astral-sh/uv)**: Fast Python package management
 
 ### Development Tools
+
 - **pytest**: Testing framework
 - **IPython**: Interactive development
 - **matplotlib**: Visualizations
@@ -308,12 +357,15 @@ Token IDs → Token Embeddings + Positional Embeddings
 ## 📚 References & Resources
 
 ### Primary Reference
+
 > **"Build a Large Language Model (From Scratch)"** by Sebastian Raschka
+>
 > - [Book on Manning](https://www.manning.com/books/build-a-large-language-model-from-scratch)
 > - [Official GitHub Repository](https://github.com/rasbt/LLMs-from-scratch)
 > - [Author's Website](https://sebastianraschka.com/)
 
 ### Additional Resources
+
 - [Attention Is All You Need (Original Transformer Paper)](https://arxiv.org/abs/1706.03762)
 - [GPT-2 Paper](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
 - [The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
@@ -322,6 +374,7 @@ Token IDs → Token Embeddings + Positional Embeddings
 ## 🚧 Roadmap
 
 ### Immediate Next Steps (Chapter 5: Pretraining)
+
 - [ ] Implement pretraining loop (next-token prediction)
 - [ ] Build data loading pipeline (tokenization + sliding window batching)
 - [ ] Implement training metrics and logging (loss, bits-per-token, perplexity)
@@ -329,17 +382,20 @@ Token IDs → Token Embeddings + Positional Embeddings
 - [ ] Provide a training entry point (e.g., train_pretraining.py) and docs
 
 ### Backlog
+
 - [ ] Temperature-based sampling for generation
 - [ ] Top-k and top-p (nucleus) sampling
 - [ ] Interactive text generation demo
 
 ### Upcoming Chapters
+
 - [ ] **Chapter 6**: Add classification head
 - [ ] **Chapter 6**: Implement fine-tuning procedures
 - [ ] **Chapter 7**: Instruction following capabilities
 - [ ] **Chapter 7**: RLHF concepts
 
 ### Future Enhancements
+
 - [ ] Add comprehensive test coverage
 - [ ] Create Jupyter notebooks for each chapter
 - [ ] Build web interface with Gradio
@@ -350,8 +406,9 @@ Token IDs → Token Embeddings + Positional Embeddings
 ## 🤝 Contributing
 
 This is a personal learning project following the book's progression. However, I welcome:
+
 - Bug reports and fixes
-- Clarifications and documentation improvements  
+- Clarifications and documentation improvements
 - Discussions about the concepts
 - Suggestions for better implementations
 
@@ -371,3 +428,4 @@ This project is for educational/starter purposes. No explicit license.
 <i>"The best way to understand something is to build it from scratch"</i><br>
 🧠 Currently learning at Chapter 5/7 of the book 📚
 </div>
+

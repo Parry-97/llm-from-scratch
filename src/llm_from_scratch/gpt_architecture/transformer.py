@@ -1,7 +1,4 @@
-import sys
-import os
-
-from attention.multi_head_attention import MultiHeadAttention
+from llm_from_scratch.attention.multi_head_attention import MultiHeadAttention
 from torch import nn
 
 

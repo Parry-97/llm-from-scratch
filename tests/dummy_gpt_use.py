@@ -1,5 +1,5 @@
 import tiktoken
-from dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
 import torch
 
 GPT_CONFIG_124M = {

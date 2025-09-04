@@ -1,6 +1,6 @@
 import torch
-from gpt_architecture.text_generation import generate_text
-from gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.text_generation import generate_text
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
 from tiktoken import get_encoding
 
 

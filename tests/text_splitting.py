@@ -1,6 +1,11 @@
 import re
+import os
 
-with open("./the-verdict.txt", "r", encoding="utf-8") as f:
+# Get the directory where this test file is located
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+TEST_FILE_PATH = os.path.join(TEST_DIR, "the-verdict.txt")
+
+with open(TEST_FILE_PATH, "r", encoding="utf-8") as f:
     raw_text = f.read()
 
 # NOTE: Preprocessing the raw text to remove punctuation and split into words or tokens

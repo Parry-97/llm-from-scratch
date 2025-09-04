@@ -1,12 +1,12 @@
 # coding: utf-8
+import torch
+from self_attention import SelfAttention_v2
 """For many LLM tasks, we want the self-attention mechanism to consider only tokens that
 appear prior to the current position when predicting the next token in a sequence.
 Causal attention, also known as masked attention, is a specialized form of attention that restricts
 a model to only consider previous and current inputs in a sequence when processing any given token"""
 """To achieve this we can mask out the attention weights above the diagonal and we normalize the non masked attention weights so that they sum up to 1 in each row"""
-import torch
 torch.manual_seed(789)
-from self_attention import SelfAttention_v2
 inputs = torch.tensor(
     [
         [0.43, 0.15, 0.89],  # Your

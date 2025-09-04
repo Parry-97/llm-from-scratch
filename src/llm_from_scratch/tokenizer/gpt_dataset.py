@@ -41,12 +41,12 @@ class GPTDatasetV1(Dataset):
     def __len__(self) -> int:
         return len(self.input_ids)
 
-    def __get__item(self, idx: int) -> Tuple[Tensor, Tensor]:
+    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
         return self.input_ids[idx], self.target_ids[idx]
 
 
 def create_dataloader_v1(
-    txt,
+    txt: str,
     batch_size=4,
     max_length=256,
     stride=128,

@@ -1,7 +1,6 @@
-# coding: utf-8
+import os
 import torch
-from text_splitting import raw_text
-from gpt_dataset import create_dataloader_v1
+from llm_from_scratch.tokenizer.gpt_dataset import create_dataloader_v1
 
 input_ids = torch.tensor([2, 3, 5, 1])
 vocab_size = 6
@@ -28,6 +27,14 @@ token_embedding_layer = torch.nn.Embedding(vocab_size, output_dim)
 if we sample data from the data loader,
 we embed each token in each batch into a 256-dimensional vector.
 """
+
+# Get the directory where this test file is located
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+TEST_FILE_PATH = os.path.join(TEST_DIR, "the-verdict.txt")
+
+with open(TEST_FILE_PATH, "r", encoding="utf-8") as f:
+    raw_text = f.read()
+
 max_len = 4
 data_loader = create_dataloader_v1(
     raw_text, batch_size=8, max_length=max_len, stride=max_len, shuffle=False
