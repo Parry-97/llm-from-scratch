@@ -48,7 +48,7 @@ attn_scores = inputs @ inputs.T
 print(attn_scores)
 attn_weights = torch.softmax(
     attn_scores, dim=-1
-)  # we normalize across the last dimension which in this case are the columns so that values in rows sum up to 1
+)  # INFO: we normalize across the last dimension which in this case are the columns so that values in rows sum up to 1
 """As the final step, we use the attention weights to compute all the context vectors via matrix multiplication"""
 all_context_vecs = attn_weights @ inputs
 print(all_context_vecs)

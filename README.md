@@ -4,7 +4,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.4.0-red)
 ![tiktoken](https://img.shields.io/badge/tiktoken-0.11.0-green)
 ![uv](https://img.shields.io/badge/uv-package%20manager-7f52ff)
-![Progress](https://img.shields.io/badge/Book_Progress-Chapter_4%2F7-orange)
+![Progress](https://img.shields.io/badge/Book_Progress-Chapter_5%2F7-orange)
 
 > A step-by-step implementation of a GPT-like Large Language Model following Sebastian Raschka's "Build a Large Language Model (From Scratch)"
 
@@ -12,18 +12,17 @@
 
 This repository documents my journey through **"Build a Large Language Model (From Scratch)"** by Sebastian Raschka. I'm implementing each concept from the book in PyTorch, building a GPT-like language model from the ground up to truly understand how modern LLMs work.
 
-### 📚 Book Progress: Chapter 4 of 7
+### 📚 Book Progress: Chapter 5 of 7
 
-Currently implementing: **"Implementing a GPT model from scratch to generate text"**
+Currently implementing: **"Pretraining on unlabeled data"**
 
 #### ✅ Completed Chapters:
 - **Chapter 1**: Understanding large language models
-- **Chapter 2**: Working with text data 
+- **Chapter 2**: Working with text data
 - **Chapter 3**: Coding attention mechanisms
-- **Chapter 4**: Implementing a GPT model from scratch to generate text *(in progress)*
+- **Chapter 4**: Implementing a GPT model from scratch to generate text
 
 #### 🔜 Upcoming Chapters:
-- **Chapter 5**: Pretraining on unlabeled data
 - **Chapter 6**: Fine-tuning for classification
 - **Chapter 7**: Fine-tuning to follow instructions
 
@@ -54,7 +53,7 @@ By following along with the book and this implementation, I'm learning:
 - **Multi-Head Attention** ([attention/multi_head_attention.py](attention/multi_head_attention.py)): Parallel attention heads with projection
 - Scaled dot-product attention with proper normalization
 
-#### 🤖 **GPT Model Architecture (Chapter 4 - Current Focus)**
+#### 🤖 **GPT Model Architecture (Chapter 4 - Completed)**
 - **DummyGPTModel** ([gpt_architecture/dummy_gpt_model.py](gpt_architecture/dummy_gpt_model.py)): Complete GPT model implementation
 - **TransformerBlock** ([gpt_architecture/transformer.py](gpt_architecture/transformer.py)): Core transformer building block
 - **FeedForward Networks**: Position-wise feed-forward with GELU activation
@@ -62,10 +61,18 @@ By following along with the book and this implementation, I'm learning:
 - Positional embeddings (learned)
 - Residual connections and dropout
 
-#### 🔤 **Text Generation (Chapter 4 - In Progress)**
-- Token sampling strategies
-- Temperature-based generation
-- Basic greedy decoding
+#### 🔤 **Text Generation (Chapter 4 - Implemented)**
+- Greedy decoding with context window cropping (generate_text in gpt_architecture/text_generation.py)
+- Deterministic next-token selection via argmax over softmax logits
+- Example script: test_text_generation.py using tiktoken (cl100k_base)
+
+#### 📦 **Pretraining on Unlabeled Data (Chapter 5 - Current Focus)**
+- Objective: next-token prediction on unlabeled corpora (language modeling)
+- Data pipeline: tokenize with tiktoken (cl100k_base), create sequences of length context_length with next-token targets
+- Batching: (batch_size, context_length) input IDs with shifted targets
+- Loss: CrossEntropyLoss over vocabulary logits on shifted targets
+- Optimizer: AdamW; regularization via dropout; gradient clipping
+- Training loop: learning-rate warmup, cosine decay (planned), checkpointing and evaluation via perplexity (planned)
 
 ## 📁 Project Structure
 
@@ -82,13 +89,15 @@ llm-from-scratch/
 │   ├── transformer.py           # Transformer block
 │   ├── feed_forward.py          # FFN layer
 │   ├── layer_normalization.py   # LayerNorm implementation
-│   └── gelu.py                  # GELU activation
+│   ├── gelu.py                  # GELU activation
+│   └── text_generation.py       # Greedy decoding utilities
 ├── tokenizer/                    # Chapter 2: Text processing
 │   ├── simple_tokenizer.py      # Tokenizer implementation
 │   ├── gpt_dataset.py          # Dataset utilities
 │   ├── sampling.py             # Generation sampling methods
 │   ├── text_splitting.py       # Text preprocessing
 │   └── the-verdict.txt         # Sample text data
+├── test_text_generation.py     # Example: run greedy text generation
 ├── tests/                       # Unit tests
 ├── pyproject.toml              # Project configuration
 └── README.md                   # This file
@@ -207,6 +216,49 @@ with torch.no_grad():
 print(f"Logits shape: {logits.shape}")  # [2, 10, 5000]
 ```
 
+### Text Generation Quickstart (Chapter 4)
+
+Example using the greedy generation loop:
+
+```python
+import torch
+from tiktoken import get_encoding
+from gpt_architecture.dummy_gpt_model import DummyGPTModel
+from gpt_architecture.text_generation import generate_text
+
+# Tokenizer and model configuration
+tokenizer = get_encoding("cl100k_base")
+config = {
+    "vocab_size": 50257,
+    "context_length": 1024,
+    "emb_dim": 768,
+    "n_heads": 12,
+    "n_layers": 12,
+    "drop_rate": 0.1,
+    "qkv_bias": False,
+}
+
+model = DummyGPTModel(config).eval()
+
+start = "Hello, I am"
+encoded = tokenizer.encode(start)
+idx = torch.tensor(encoded).unsqueeze(0)
+
+out = generate_text(
+    model=model,
+    idx=idx,
+    max_new_tokens=6,
+    context_size=config["context_length"],
+)
+print(tokenizer.decode(out.squeeze(0).tolist()))
+```
+
+Run the example script directly:
+
+```bash
+uv run python test_text_generation.py
+```
+
 ## 🔬 Technical Implementation Details
 
 ### Current Architecture (Chapter 4)
@@ -269,16 +321,19 @@ Token IDs → Token Embeddings + Positional Embeddings
 
 ## 🚧 Roadmap
 
-### Immediate Next Steps (Chapter 4 completion)
-- [ ] Implement temperature-based sampling
-- [ ] Add top-k and top-p (nucleus) sampling
-- [ ] Create text generation utilities
-- [ ] Build interactive generation demo
+### Immediate Next Steps (Chapter 5: Pretraining)
+- [ ] Implement pretraining loop (next-token prediction)
+- [ ] Build data loading pipeline (tokenization + sliding window batching)
+- [ ] Implement training metrics and logging (loss, bits-per-token, perplexity)
+- [ ] Add checkpointing and resumability
+- [ ] Provide a training entry point (e.g., train_pretraining.py) and docs
+
+### Backlog
+- [ ] Temperature-based sampling for generation
+- [ ] Top-k and top-p (nucleus) sampling
+- [ ] Interactive text generation demo
 
 ### Upcoming Chapters
-- [ ] **Chapter 5**: Implement pretraining loop
-- [ ] **Chapter 5**: Add data loading pipeline
-- [ ] **Chapter 5**: Implement training metrics and logging
 - [ ] **Chapter 6**: Add classification head
 - [ ] **Chapter 6**: Implement fine-tuning procedures
 - [ ] **Chapter 7**: Instruction following capabilities
@@ -302,7 +357,7 @@ This is a personal learning project following the book's progression. However, I
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) for details
+This project is for educational/starter purposes. No explicit license.
 
 ## 🙏 Acknowledgments
 
@@ -314,6 +369,5 @@ MIT License - See [LICENSE](LICENSE) for details
 
 <div align="center">
 <i>"The best way to understand something is to build it from scratch"</i><br>
-🧠 Currently learning at Chapter 4/7 of the book 📚
+🧠 Currently learning at Chapter 5/7 of the book 📚
 </div>
-

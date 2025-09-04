@@ -10,7 +10,7 @@ If we didn’t use trainable weight matrices, attention would look like this:
 
 - Each token is just a vector from the embedding space.
 - We compute **attention scores** by dot-producting those vectors directly.
-- Normalize with softmax.
+- Normalize with softmax to make the scores add up to 1.
 - Use those weights to take a weighted sum of the embeddings.
 
 This would give you some context mixing — but **only in the raw embedding space**.

@@ -7,8 +7,9 @@ This document explains the mathematical operations in the self-attention mechani
 ## The Self-Attention Implementation
 
 The self-attention mechanism involves three key learnable weight matrices:
+
 - **W_query**: Transforms inputs into query vectors
-- **W_key**: Transforms inputs into key vectors  
+- **W_key**: Transforms inputs into key vectors
 - **W_value**: Transforms inputs into value vectors
 
 ```python
@@ -29,6 +30,7 @@ context_vec = attn_weights @ values  # shape: [6,2]
 The attention mechanism needs to compute **pairwise similarities** between all queries and keys to determine how much each position should attend to every other position.
 
 #### Attention Scores Computation
+
 ```python
 attn_scores = queries @ keys.T  # [6,2] @ [2,6] = [6,6]
 ```
@@ -38,6 +40,7 @@ attn_scores = queries @ keys.T  # [6,2] @ [2,6] = [6,6]
 - **Required output**: `[6, 6]` matrix where element `[i,j]` = similarity(query_i, key_j)
 
 The transpose is essential because:
+
 1. Query at position `i` is row `i` of the queries matrix
 2. Key at position `j` is row `j` of the keys matrix
 3. To compute their dot product, we need to align query row `i` with key row `j`
@@ -50,11 +53,13 @@ context_vec = attn_weights @ values  # [6,6] @ [6,2] = [6,2]
 ```
 
 The context vector computation performs **weighted aggregation** of values:
+
 - **Attention weights**: `[6, 6]` - how much each position attends to all positions
 - **Values**: `[6, 2]` - value vectors at each position
 - **Output**: `[6, 2]` - weighted combination for each position
 
 No transpose needed because:
+
 - Row `i` of attention weights contains weights for position `i`
 - These weights directly multiply with value vectors (rows of values matrix)
 - Matrix multiplication naturally performs the weighted sum
@@ -64,6 +69,7 @@ No transpose needed because:
 Consider a simplified case with 3 positions and 2 dimensions:
 
 ### Computing Attention Scores (Requires Transpose)
+
 ```
 Queries: [[q1_d1, q1_d2],    Keys: [[k1_d1, k1_d2],
           [q2_d1, q2_d2],            [k2_d1, k2_d2],
@@ -80,6 +86,7 @@ Result: [[q1·k1, q1·k2, q1·k3],
 ```
 
 ### Computing Context Vectors (No Transpose)
+
 ```
 Weights: [[w11, w12, w13],    Values: [[v1_d1, v1_d2],
           [w21, w22, w23],              [v2_d1, v2_d2],
@@ -115,11 +122,17 @@ Row 5:  [  score,    score,    score,    score,    score,    score  ]  ← Query
 ### After Softmax: Attention Weights
 
 After applying softmax normalization:
+
 ```python
 attn_weights = torch.softmax(attn_scores / keys.shape[-1] ** 0.5, dim=-1)
 ```
 
+> [!IMPORTANT]
+> In words, the **softmax** applies the standard exponential function to each element z_i
+> and normalizes these values by dividing by the sum of all these exponentials.
+
 Each row becomes a **probability distribution** (sums to 1):
+
 - **Row 0**: Probability distribution for how position 0 combines information from all positions
 - **Row 1**: Probability distribution for how position 1 combines information from all positions
 - And so on...
@@ -129,6 +142,7 @@ Each row becomes a **probability distribution** (sums to 1):
 Consider processing the sentence "The cat sat":
 
 **Attention Scores (before softmax):**
+
 ```
          ["The", "cat", "sat"]
 "The":   [ 0.9,   2.1,   0.3 ]  ← "The" has high affinity for "cat"
@@ -137,6 +151,7 @@ Consider processing the sentence "The cat sat":
 ```
 
 **Attention Weights (after softmax):**
+
 ```
          ["The", "cat", "sat"]
 "The":   [ 0.20,  0.70,  0.10]  ← 70% attention on "cat"
@@ -147,11 +162,13 @@ Consider processing the sentence "The cat sat":
 ### Impact on Context Vectors
 
 When computing context vectors:
+
 ```python
 context_vec = attn_weights @ values
 ```
 
 Each row of attention weights determines the final output:
+
 - **Position 0's output**: 20% of value₀ + 70% of value₁ + 10% of value₂
 - **Position 1's output**: 10% of value₀ + 45% of value₁ + 45% of value₂
 - **Position 2's output**: 5% of value₀ + 35% of value₁ + 60% of value₂
@@ -171,18 +188,21 @@ Each row of attention weights determines the final output:
 ## Implementation Comparison
 
 ### Using nn.Parameter (SelfAttention)
+
 ```python
 self.W_query = torch.nn.Parameter(torch.randn(d_in, d_out))
 keys = x @ self.W_key  # Manual matrix multiplication
 ```
 
 ### Using nn.Linear (SelfAttention_v2)
+
 ```python
 self.W_query = torch.nn.Linear(d_in, d_out, bias=qkv_bias)
 keys = self.W_key(x)  # Linear layer handles the operation
 ```
 
 Both achieve the same result, but `nn.Linear`:
+
 - Provides better weight initialization (Kaiming/He initialization)
 - Optionally includes bias terms
 - Offers cleaner, more maintainable code
@@ -191,6 +211,7 @@ Both achieve the same result, but `nn.Linear`:
 ## Summary
 
 The self-attention mechanism elegantly uses matrix operations to:
+
 1. **Compute relationships** between all positions (requiring transpose for dot products)
 2. **Create attention distributions** (softmax normalization per row)
 3. **Aggregate information** (weighted sum without transpose)

@@ -1,7 +1,7 @@
 from torch import nn
-from gpt_architecture.transformer import TransformerBlock
-from gpt_architecture.layer_normalization import LayerNorm
 import torch
+from .transformer import TransformerBlock
+from .layer_normalization import LayerNorm
 
 
 class DummyGPTModel(nn.Module):
@@ -25,10 +25,16 @@ class DummyGPTModel(nn.Module):
         self.trf_blocks = nn.Sequential(
             *[TransformerBlock(cfg) for _ in range(cfg["n_layers"])]
         )
-
+        # NOTE: Following the transformer blocks,
+        # a LayerNorm layer is applied, standardizing the outputs from the transformer blocks to
+        # stabilize the learning process.
         self.final_norm = LayerNorm(cfg["emb_dim"])
 
-        # NOTE: The final layer gets emb_dim features and outputs vocab_size outputs
+        # NOTE:
+        # The output from the final transformer block then goes through a final layer normal-
+        # ization step before reaching the linear output layer. This layer maps the transformer’s
+        # output to a high-dimensional space (in this case, 50,257 dimensions, corresponding to
+        # the model’s vocabulary size) to predict the next token in the sequence.
         self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
 
     def forward(self, in_idx):

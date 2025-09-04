@@ -19,25 +19,30 @@ class TransformerBlock(nn.Module):
             qkv_bias=cfg.get("qkv_bias", False),
         )
         self.feed_forward = FeedForward(cfg)
+        # NOTE: We use normalization both inside a transformer block
+        # as well after them in the gpt model architecture
         self.norm1 = nn.LayerNorm(cfg["emb_dim"])
         self.norm2 = nn.LayerNorm(cfg["emb_dim"])
         self.drop_resid = nn.Dropout(cfg["drop_rate"])
 
     def forward(self, x):
-        # Attention block with residual connection
+        # NOTE: Attention block with residual connection
+        # This critical feature helps gradients flow through the network during training and improves the
+        # learning of deep models (see section 4.4).
         shortcut = x
         x = self.norm1(x)
         x = self.attention(x)
         x = self.drop_resid(x)
         x = x + shortcut
 
-        # Feed-forward block with residual connection
+        # NOTE: Feed-forward block with residual connection
         shortcut = x
         x = self.norm2(x)
         x = self.feed_forward(x)
         x = self.drop_resid(x)
         x = x + shortcut
-
+        # INFO:  the output is a context vector that encapsulates information from the entire
+        # input sequence
         return x
 
 

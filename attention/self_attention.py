@@ -26,6 +26,11 @@ class SelfAttention(torch.nn.Module):
         queries = x @ self.W_query  # shape: [6,2]
         values = x @ self.W_value  # shape: [6,2]
         attn_scores = queries @ keys.T  # omega with shape: [6,2] @ [2,6] =  [6,6]
+        """
+        the softmax function ensures that the attention weights are always posi-
+        tive. This makes the output interpretable as probabilities or relative importance,
+        where higher weights indicate greater importance.
+        """
         attn_weights = torch.softmax(attn_scores / keys.shape[-1] ** 0.5, dim=-1)
         context_vec = attn_weights @ values  # shape: [6,6] @ [6,2] = [6,2]
         return context_vec
