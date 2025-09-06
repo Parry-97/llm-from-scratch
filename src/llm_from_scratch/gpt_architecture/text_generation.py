@@ -9,7 +9,7 @@ putes predictions, and then selects the next token based on the highest probabil
 prediction"""
 
 
-def generate_text(
+def generate_text_simple(
     model: DummyGPTModel,
     idx: Tensor,  # INFO: this has shape (batch_size, num_tokens)
     max_new_tokens: int,
@@ -46,3 +46,55 @@ def generate_text(
         idx = torch.cat([idx, idx_next], dim=-1)
 
     return idx
+
+
+def generate_text(
+    model: DummyGPTModel,
+    idx: Tensor,  # INFO: this has shape (batch_size, num_tokens)
+    max_new_tokens: int,
+    context_size: int,
+    temperature: float = 0.0,
+    top_k: int | None = None,
+    eos_token_id: int | None = None,
+):
+    for _ in range(max_new_tokens):
+        idx_cond = idx[
+            :, -context_size:
+        ]  # NOTE: we pick only the last context_size tokens
+
+        with torch.no_grad():
+            logits: Tensor = model(idx_cond)
+
+        logits = logits[
+            :, -1, :
+        ]  # NOTE: we pick only the last logit, with shape (batch, vocab_size)
+
+        if top_k is not None:
+            top_logits, _ = torch.topk(
+                logits, top_k
+            )  # NOTE: Filters logits with topk sampling
+            min_val = top_logits[:, -1]  # NOTE: getting the minimum valued logit
+
+            # WARN: When condition is True for the index, yield input, otherwise yield other
+            logits = torch.where(
+                logits < min_val, torch.tensor(float("-inf")).to(logits.device), logits
+            )
+        if temperature > 0.0:  # NOTE: Applies temperature scaling to the logits
+            logits = logits / temperature
+            probs = torch.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, 1)
+        else:
+            idx_next = torch.argmax(
+                logits, dim=-1, keepdim=True
+            )  # NOTE: carries out greedy next token selection as before when temperature sampling is disabled
+
+        if idx_next == eos_token_id:  # Stop generating early if eos_token_id is reached
+            break
+        idx = torch.cat([idx, idx_next], dim=-1)
+
+    return idx
+
+
+def softmax_with_temperature(logits, temperature):
+    scaled_logits = logits / temperature
+    return torch.softmax(scaled_logits, dim=0)

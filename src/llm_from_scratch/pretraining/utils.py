@@ -1,5 +1,5 @@
 import tiktoken
-from llm_from_scratch.gpt_architecture.text_generation import generate_text
+from llm_from_scratch.gpt_architecture.text_generation import generate_text_simple
 from torch.utils.data import DataLoader
 import torch
 from torch import Tensor
@@ -83,7 +83,7 @@ def main():
     torch.manual_seed(123)
     model = DummyGPTModel(GPT_CONFIG_124M)
 
-    token_ids = generate_text(
+    token_ids = generate_text_simple(
         model=model,
         context_size=GPT_CONFIG_124M["context_length"],
         max_new_tokens=10,
@@ -165,7 +165,7 @@ def generate_and_print_sample(model, tokenizer, device, start_context):
     context_size = model.pos_emb.weight.shape[0]
     encoded = text_to_token(start_context, tokenizer).to(device)
     with torch.no_grad():
-        token_ids = generate_text(
+        token_ids = generate_text_simple(
             model=model, idx=encoded, max_new_tokens=50, context_size=context_size
         )
         decoded_text = token_ids_to_text(token_ids, tokenizer)
