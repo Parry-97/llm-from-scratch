@@ -1,6 +1,6 @@
 import torch
 from llm_from_scratch.gpt_architecture.text_generation import generate_text_simple
-from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import GPTModel
 from tiktoken import get_encoding
 
 
@@ -21,7 +21,7 @@ GPT_CONFIG_124M = {
     "drop_rate": 0.1,
     "qkv_bias": False,
 }
-model = DummyGPTModel(GPT_CONFIG_124M)
+model = GPTModel(GPT_CONFIG_124M)
 
 model.eval()
 out = generate_text_simple(

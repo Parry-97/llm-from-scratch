@@ -1,5 +1,5 @@
 import os
-from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import GPTModel
 from llm_from_scratch.tokenizer.gpt_dataset import create_dataloader_v1
 from llm_from_scratch.pretraining.utils import calc_loss_loader
 import torch
@@ -67,7 +67,7 @@ def main():
         print(x.shape, y.shape)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = DummyGPTModel(GPT_CONFIG_124M).to(device)
+    model = GPTModel(GPT_CONFIG_124M).to(device)
     with torch.no_grad():
         train_loss = calc_loss_loader(train_loader, model, device)
         val_loss = calc_loss_loader(val_loader, model, device)

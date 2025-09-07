@@ -1,5 +1,5 @@
 import tiktoken
-from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import GPTModel
 import torch
 
 GPT_CONFIG_124M = {
@@ -32,7 +32,7 @@ print(batch)
 # INFO: Next, we initialize a new 124-million-parameter DummyGPTModel instance and feed it
 # the tokenized batch:
 torch.manual_seed(123)
-model = DummyGPTModel(GPT_CONFIG_124M)
+model = GPTModel(GPT_CONFIG_124M)
 
 logits = model(batch)
 # INFO: The output tensor has two rows corresponding to the two text samples. Each text sam-

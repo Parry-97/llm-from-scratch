@@ -1,10 +1,11 @@
 import tiktoken
+import os
 from llm_from_scratch.gpt_architecture.text_generation import generate_text_simple
 from torch.utils.data import DataLoader
 import torch
 from torch import Tensor
 
-from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import GPTModel
 
 
 def text_to_token(text: str, tokenizer: tiktoken.Encoding):
@@ -21,7 +22,7 @@ def token_ids_to_text(token_ids: torch.Tensor, tokenizer: tiktoken.Encoding):
 
 
 def calc_loss_batch(
-    input_batch: Tensor, target_batch: Tensor, model: DummyGPTModel, device: str
+    input_batch: Tensor, target_batch: Tensor, model: GPTModel, device: str
 ):
     input_batch = input_batch.to(device)
     target_batch = target_batch.to(device)
@@ -32,6 +33,9 @@ def calc_loss_batch(
     # probabilities.PyTorch’s cross_entropy function will take care of all these
     # steps for us
 
+    # WARN: We are getting a single score across different batch sizes because
+    # cross entropy averages the log probabilities in order to uniformly also consider
+    # varying length sequences
     loss = torch.nn.functional.cross_entropy(
         logits.flatten(0, 1), target_batch.flatten()
     )
@@ -41,7 +45,7 @@ def calc_loss_batch(
 
 def calc_loss_loader(
     data_loader: DataLoader,
-    model: DummyGPTModel,
+    model: GPTModel,
     device: str,
     num_batches: int | None = None,
 ):
@@ -67,33 +71,8 @@ def calc_loss_loader(
     return total_loss / num_batches  # NOTE: Aveerages over all batches
 
 
-def main():
-    start_context = "Every effort moves you"
-    tokenizer = tiktoken.get_encoding("gpt2")
-
-    GPT_CONFIG_124M = {
-        "vocab_size": 50257,
-        "context_length": 1024,
-        "emb_dim": 768,
-        "n_heads": 12,
-        "n_layers": 12,
-        "drop_rate": 0.1,
-        "qkv_bias": False,
-    }
-    torch.manual_seed(123)
-    model = DummyGPTModel(GPT_CONFIG_124M)
-
-    token_ids = generate_text_simple(
-        model=model,
-        context_size=GPT_CONFIG_124M["context_length"],
-        max_new_tokens=10,
-        idx=text_to_token(start_context, tokenizer),
-    )
-    print(f"Output text:\n {token_ids_to_text(token_ids, tokenizer)}")
-
-
 def train_model_simple(
-    model: DummyGPTModel,
+    model: GPTModel,
     train_loader: DataLoader,
     val_loader: DataLoader,
     optimizer,
@@ -108,8 +87,8 @@ def train_model_simple(
     A typical training loop for training deep neural networks in
     PyTorch consists of numerous steps starting with iterating
     over each epoch, processing batches, resetting gradients,
-    calculating the loss and new gradients, and updating weights and concluding with monitoring steps like printing
-    losses and generating text samples
+    calculating the loss and new gradients, and updating weights and
+    concluding with monitoring steps like printing losses and generating text samples
     """
     train_losses, val_losses, track_tokens_seen = (
         [],
@@ -171,6 +150,78 @@ def generate_and_print_sample(model, tokenizer, device, start_context):
         decoded_text = token_ids_to_text(token_ids, tokenizer)
         print(decoded_text.replace("\n", " "))
     model.train()
+
+
+def save_model_and_optimizer(
+    model: GPTModel,
+    optimizer: torch.optim.AdamW,  # pyright: ignore
+    path: os.PathLike,
+):
+    """
+    Saving a PyTorch model is relatively straightforward. The recommended
+    way is to save a model’s state_dict, a dictionary mapping each layer to its parameters,
+    using the torch.save function:
+
+    If we plan to continue pre-training a model later—for example, using the
+    train_model_simple function we defined earlier—saving the optimizer
+    state is also recommended.
+    """
+
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+        },
+        path,
+    )
+
+
+def load_model_and_optimizer(path: os.PathLike):
+    """
+    Then we can restore the model and optimizer states by first loading the saved data via
+    torch.load and then using the load_state_dict method:
+    """
+    checkpoint = torch.load(path)
+
+    GPT_CONFIG_124M = {
+        "vocab_size": 50257,
+        "context_length": 1024,
+        "emb_dim": 768,
+        "n_heads": 12,
+        "n_layers": 12,
+        "drop_rate": 0.1,
+        "qkv_bias": False,
+    }
+    model = GPTModel(GPT_CONFIG_124M)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer = torch.optim.AdamW(model.parameters(), lr=5e-4, weight_decay=0.1)  # pyright: ignore
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+
+
+def main():
+    start_context = "Every effort moves you"
+    tokenizer = tiktoken.get_encoding("gpt2")
+
+    GPT_CONFIG_124M = {
+        "vocab_size": 50257,
+        "context_length": 1024,
+        "emb_dim": 768,
+        "n_heads": 12,
+        "n_layers": 12,
+        "drop_rate": 0.1,
+        "qkv_bias": False,
+    }
+    torch.manual_seed(123)
+    model = GPTModel(GPT_CONFIG_124M)
+
+    token_ids = generate_text_simple(
+        model=model,
+        context_size=GPT_CONFIG_124M["context_length"],
+        max_new_tokens=10,
+        idx=text_to_token(start_context, tokenizer),
+    )
+
+    print(f"Output text:\n {token_ids_to_text(token_ids, tokenizer)}")
 
 
 if __name__ == "__main__":

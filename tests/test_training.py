@@ -1,6 +1,6 @@
 import torch
 
-from llm_from_scratch.gpt_architecture.dummy_gpt_model import DummyGPTModel
+from llm_from_scratch.gpt_architecture.dummy_gpt_model import GPTModel
 from llm_from_scratch.pretraining.utils import train_model_simple
 import os
 from tiktoken import get_encoding
@@ -26,7 +26,7 @@ GPT_CONFIG_124M = {
     "qkv_bias": False,
 }
 
-model = DummyGPTModel(GPT_CONFIG_124M)
+model = GPTModel(GPT_CONFIG_124M)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model.to(device=device)
 
@@ -35,8 +35,8 @@ model.to(device=device)
 # prevent overfitting by penalizing larger weights. This adjustment allows AdamW to
 # achieve more effective regularization and better generalization; thus, AdamW is fre-
 # quently used in the training of LLMs.
-optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
-num_epochs = 10
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)  # pyright: ignore
+num_epochs = 2
 
 train_ratio = 0.90
 split_idx = int(len(text_data) * train_ratio)

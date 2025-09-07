@@ -4,7 +4,7 @@ from .transformer import TransformerBlock
 from .layer_normalization import LayerNorm
 
 
-class DummyGPTModel(nn.Module):
+class GPTModel(nn.Module):
     """
     The DummyGPTModel class in this code defines a simplified version of a GPT-like
     model using PyTorch’s neural network module (nn.Module)

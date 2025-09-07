@@ -1,6 +1,6 @@
 import torch
 from torch import Tensor
-from .dummy_gpt_model import DummyGPTModel
+from .dummy_gpt_model import GPTModel
 
 """This code demonstrates a simple implementation of a generative loop for a lan-
 guage model using PyTorch. It iterates for a specified number of new tokens to be
@@ -10,7 +10,7 @@ prediction"""
 
 
 def generate_text_simple(
-    model: DummyGPTModel,
+    model: GPTModel,
     idx: Tensor,  # INFO: this has shape (batch_size, num_tokens)
     max_new_tokens: int,
     context_size: int,
@@ -49,7 +49,7 @@ def generate_text_simple(
 
 
 def generate_text(
-    model: DummyGPTModel,
+    model: GPTModel,
     idx: Tensor,  # INFO: this has shape (batch_size, num_tokens)
     max_new_tokens: int,
     context_size: int,
