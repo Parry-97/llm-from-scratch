@@ -58,5 +58,3 @@ Think of embeddings as _photographs of objects_.
 - That’s how the model learns rich, flexible notions of “relatedness.”
 
 ---
-
-💡 Let me pause and ask you: does the motivation behind having _separate learned projections for Q, K, and V_ make sense so far, compared to just working in the raw embedding space? Would you like me to show you a toy example of what happens if you remove them?
