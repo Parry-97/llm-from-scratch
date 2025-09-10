@@ -4,7 +4,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.4.0-red)
 ![tiktoken](https://img.shields.io/badge/tiktoken-0.11.0-green)
 ![uv](https://img.shields.io/badge/uv-package%20manager-7f52ff)
-![Progress](https://img.shields.io/badge/Book_Progress-Chapter_5%2F7-orange)
+![Progress](https://img.shields.io/badge/Book_Progress-Chapter_6%2F7-orange)
 
 > A step-by-step implementation of a GPT-like Large Language Model following Sebastian Raschka's "Build a Large Language Model (From Scratch)"
 
@@ -12,9 +12,9 @@
 
 This repository documents my journey through **"Build a Large Language Model (From Scratch)"** by Sebastian Raschka. I'm implementing each concept from the book in PyTorch, building a GPT-like language model from the ground up to truly understand how modern LLMs work.
 
-### 📚 Book Progress: Chapter 5 of 7
+### 📚 Book Progress: Chapter 6 of 7
 
-Currently implementing: **"Pretraining on unlabeled data"**
+Currently implementing: **"Fine-tuning for classification"**
 
 #### ✅ Completed Chapters
 
@@ -22,10 +22,10 @@ Currently implementing: **"Pretraining on unlabeled data"**
 - **Chapter 2**: Working with text data
 - **Chapter 3**: Coding attention mechanisms
 - **Chapter 4**: Implementing a GPT model from scratch to generate text
+- **Chapter 5**: Pretraining on unlabeled data
 
 #### 🔜 Upcoming Chapters
 
-- **Chapter 6**: Fine-tuning for classification
 - **Chapter 7**: Fine-tuning to follow instructions
 
 ## 🎯 Learning Objectives
@@ -76,7 +76,7 @@ By following along with the book and this implementation, I'm learning:
 - Deterministic next-token selection via argmax over softmax logits
 - Example script: [tests/test_text_generation.py](tests/test_text_generation.py) using tiktoken (cl100k_base)
 
-#### 📦 **Pretraining on Unlabeled Data (Chapter 5 - Current Focus)**
+#### 📦 **Pretraining on Unlabeled Data (Chapter 5 - Completed)**
 
 - **Pretraining Utils** ([src/llm_from_scratch/pretraining/utils.py](src/llm_from_scratch/pretraining/utils.py)): Helper functions for training
 - Objective: next-token prediction on unlabeled corpora (language modeling)
@@ -85,6 +85,15 @@ By following along with the book and this implementation, I'm learning:
 - Loss: CrossEntropyLoss over vocabulary logits on shifted targets
 - Optimizer: AdamW; regularization via dropout; gradient clipping
 - Training loop: learning-rate warmup, cosine decay (planned), checkpointing and evaluation via perplexity (planned)
+
+#### 💬 **Fine-tuning for Classification (Chapter 6 - Current Focus)**
+
+- **Spam Dataset** ([src/llm_from_scratch/clf_finetuning/spam_dataset.py](src/llm_from_scratch/clf_finetuning/spam_dataset.py)): Dataset preparation for spam classification
+- **Finetuning Utils** ([src/llm_from_scratch/clf_finetuning/utils.py](src/llm_from_scratch/clf_finetuning/utils.py)): Helper functions for fine-tuning
+- Objective: classification on labeled data
+- Data pipeline: preparing the spam dataset for classification
+- Loss: CrossEntropyLoss for classification
+- Training loop: fine-tuning the pretrained model on the classification task
 
 ## 📁 Project Structure
 
@@ -373,13 +382,14 @@ Token IDs → Token Embeddings + Positional Embeddings
 
 ## 🚧 Roadmap
 
-### Immediate Next Steps (Chapter 5: Pretraining)
+### Immediate Next Steps (Chapter 6: Fine-tuning)
 
-- [ ] Implement pretraining loop (next-token prediction)
-- [ ] Build data loading pipeline (tokenization + sliding window batching)
-- [ ] Implement training metrics and logging (loss, bits-per-token, perplexity)
-- [ ] Add checkpointing and resumability
-- [ ] Provide a training entry point (e.g., train_pretraining.py) and docs
+- [ ] Implement classification head
+- [ ] Implement fine-tuning loop for classification
+- [ ] Build data loading pipeline for spam classification
+- [ ] Implement training metrics and logging for classification
+- [ ] Add checkpointing and resumability for fine-tuning
+- [ ] Provide a fine-tuning entry point (e.g., `train_finetuning.py`) and docs
 
 ### Backlog
 
@@ -389,8 +399,6 @@ Token IDs → Token Embeddings + Positional Embeddings
 
 ### Upcoming Chapters
 
-- [ ] **Chapter 6**: Add classification head
-- [ ] **Chapter 6**: Implement fine-tuning procedures
 - [ ] **Chapter 7**: Instruction following capabilities
 - [ ] **Chapter 7**: RLHF concepts
 
@@ -426,6 +434,6 @@ This project is for educational/starter purposes. No explicit license.
 
 <div align="center">
 <i>"The best way to understand something is to build it from scratch"</i><br>
-🧠 Currently learning at Chapter 5/7 of the book 📚
+🧠 Currently learning at Chapter 6/7 of the book 📚
 </div>
 
