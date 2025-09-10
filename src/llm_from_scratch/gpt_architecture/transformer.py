@@ -1,4 +1,5 @@
 from llm_from_scratch.attention.multi_head_attention import MultiHeadAttention
+from llm_from_scratch.gpt_architecture.layer_normalization import LayerNorm
 from torch import nn
 
 
@@ -18,8 +19,8 @@ class TransformerBlock(nn.Module):
         self.feed_forward = FeedForward(cfg)
         # NOTE: We use normalization both inside a transformer block
         # as well after them in the gpt model architecture
-        self.norm1 = nn.LayerNorm(cfg["emb_dim"])
-        self.norm2 = nn.LayerNorm(cfg["emb_dim"])
+        self.norm1 = LayerNorm(cfg["emb_dim"])
+        self.norm2 = LayerNorm(cfg["emb_dim"])
         self.drop_resid = nn.Dropout(cfg["drop_rate"])
 
     def forward(self, x):
