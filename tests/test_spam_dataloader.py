@@ -1,5 +1,4 @@
 import pandas as pd
-import pytest
 import torch
 from llm_from_scratch.clf_finetuning.spam_dataset import SpamDataset
 

@@ -1,4 +1,3 @@
-import os
 import torch
 import pytest
 from llm_from_scratch.gpt_architecture.dummy_gpt_model import GPTModel
@@ -73,3 +72,4 @@ def test_calc_loss_loader(gpt_config, data_loaders):
     assert isinstance(val_loss, float)
     assert train_loss > 0
     assert val_loss > 0
+
