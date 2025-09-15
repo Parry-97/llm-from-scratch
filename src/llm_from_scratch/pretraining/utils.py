@@ -32,7 +32,8 @@ def calc_loss_batch(
     # INFO:  Previously, we applied the softmax function, selected the probability
     # scores corresponding to the target IDs, and computed the negative average log
     # probabilities.PyTorch’s cross_entropy function will take care of all these
-    # steps for us
+    # steps for us. The idea is to basically maximiize the probability of the right
+    # token ids by minimizing their negative average log probability
 
     # WARN: We are getting a single score across different batch sizes because
     # cross entropy averages the log probabilities in order to uniformly also consider

@@ -5,6 +5,7 @@ from llm_from_scratch.pretraining.utils import train_model_simple
 from llm_from_scratch.tokenizer.gpt_dataset import create_dataloader_v1
 from tiktoken import get_encoding
 
+
 # Pytest fixture for the GPT model configuration
 @pytest.fixture
 def gpt_config():
@@ -18,20 +19,25 @@ def gpt_config():
         "qkv_bias": False,
     }
 
+
 # Pytest fixture for the GPT model
 @pytest.fixture
 def gpt_model(gpt_config):
     return GPTModel(gpt_config)
+
 
 # Pytest fixture for the tokenizer
 @pytest.fixture
 def tokenizer():
     return get_encoding("gpt2")
 
+
 # Pytest fixture for the data loaders
 @pytest.fixture
 def data_loaders(gpt_config):
-    text_data = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z" * 100  # Dummy data
+    text_data = (
+        "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z" * 100
+    )  # Dummy data
     train_ratio = 0.90
     split_idx = int(len(text_data) * train_ratio)
     train_data = text_data[:split_idx]
@@ -58,6 +64,7 @@ def data_loaders(gpt_config):
     )
     return train_loader, val_loader
 
+
 # Test the simple training function
 def test_train_model_simple(gpt_model, data_loaders, tokenizer):
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -67,7 +74,7 @@ def test_train_model_simple(gpt_model, data_loaders, tokenizer):
     # prevent overfitting by penalizing larger weights. This adjustment allows AdamW to
     # achieve more effective regularization and better generalization; thus, AdamW is fre-
     # quently used in the training of LLMs.
-    optimizer = torch.optim.AdamW(gpt_model.parameters(), lr=0.0004, weight_decay=0.1)
+    optimizer = torch.optim.AdamW(gpt_model.parameters(), lr=0.0004, weight_decay=0.1)  # pyright: ignore
     train_loader, val_loader = data_loaders
 
     # Train for a small number of epochs and iterations for testing purposes
