@@ -37,3 +37,8 @@ dev = [
   "ruff>=0.5.5",
   "hatch>=1.11.1",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow to run",
+]
